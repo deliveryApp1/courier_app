@@ -1,0 +1,23 @@
+{
+  "titles": {
+    "new_orders": "Новые заказы",
+    "active_orders": "Активные заказы",
+    "delivered_orders": "Доставленные заказы"
+  },
+  "address": "Адрес",
+  "total_summ": "Общая сумма",
+  "total_products_quantity": "Общее количество продуктов",
+  "payment_type": "Способ оплаты",
+  "payment_status": "Статус платежа",
+  "products": "Продукты",
+  "name": "Имя",
+  "price": "Цена",
+  "quantity": "Количество",
+  "languages": "Язык",
+  "actions": {
+    "take_order": "Взять заказ",
+    "complete_order": "Выполнить заказ"
+  },
+  "call": "Позвонить",
+  "on_map": "На карте"
+}

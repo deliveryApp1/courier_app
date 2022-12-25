@@ -1,0 +1,23 @@
+{
+  "titles": {
+    "new_orders": "Yangi buyurtmalar",
+    "active_orders": "Faol",
+    "delivered_orders": "Yetkazilgan"
+  },
+  "address": "Manzil",
+  "total_summ": "Umumiy summa",
+  "total_products_quantity": "Mahsulotlarning umumiy miqdori",
+  "payment_type": "To'lov turi",
+  "payment_status": "To'lov holati",
+  "products": "Mahsulotlar",
+  "name": "Nomi",
+  "price": "Narzi",
+  "quantity": "Miqdori",
+  "languages": "Til",
+  "actions": {
+    "take_order": "Buyurtmani olish",
+    "complete_order": "Buyurtmani yakunlash"
+  },
+  "call": "Qo'ng'iroq",
+  "on_map": "Xarita"
+}
