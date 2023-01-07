@@ -1,4 +1,4 @@
-package com.courier.newarchitecture.modules;
+package courier.uz.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;

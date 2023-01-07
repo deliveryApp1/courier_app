@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const initialState = {
     user: {
-        isAllowed: true,
+        isAllowed: false,
         token: null,
         lang: 'ru'
     },
@@ -20,13 +20,21 @@ const userSlice = createSlice({
             state.authNumber = action.payload
             state.skipAuth = false
         },
+        setUser: (state, action) => {
+            state.user = action.payload
+            state.skipAuth = false
+            // console.log('action.payload: ', action.payload);
+            // storeData(token, action.payload.token)
+            AsyncStorage.setItem('token', action.payload.token)
+        },
         changeuserLang: (state, action) => {
             state.user.lang = action.payload
+            // storeData(lang, action.payload)
             AsyncStorage.setItem('lang', action.payload)
         }
     }
 })
 
-export const { setAuthNumber, changeuserLang } = userSlice.actions
+export const { setAuthNumber, changeuserLang, setUser } = userSlice.actions
 const userReducer = userSlice.reducer
 export default userReducer

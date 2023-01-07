@@ -1,22 +1,42 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { BASE_API_URL } from '@env'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+var token = null
 export const orderApi = createApi({
     reducerPath: "orderApi",
-    baseQuery: fetchBaseQuery({ baseUrl: `${BASE_API_URL}` }),
+    baseQuery: fetchBaseQuery({
+        // baseUrl: `${BASE_API_URL}`,
+        baseUrl: `http://54.243.4.145/`,
+        prepareHeaders: (headers, { getState }) => {
+            // try {
+            // By default, if we have a token in the store, let's use that for authenticated requests
+            token = getState()?.user?.user?.token
+            if (token) {
+                headers.set('authorization', `Bearer ${token}`)
+            }
+            return headers;
+            // } catch (error) {
+            //     console.log('prepareHeader error: ', error);
+            // }
+        }
+    }),
     tagTypes: ['Orders'],
     endpoints: (build) => ({
         getOrders: build.query({
-            query: (query) => {
-                // console.log('api query: ', query)
-                return `order?status=${query}`
-            },
+            query: query => ({
+                url: `order?status=${query}`,
+                // headers: { "Authorization": `Bearer ${token}` }
+            }),
             providesTags: ['Orders']
         }),
-        auth: build.query({
-            query: (query) => {
-                console.log('auth query: ', query)
-                return `auth/${query}`
+        auth: build.mutation({
+            query: (credentials) => {
+                return ({
+                    url: "auth/login",
+                    method: "POST",
+                    body: credentials
+                })
             }
         }),
         addOrder: build.mutation({
@@ -86,7 +106,7 @@ export const {
     useGetDeliveredOrdersQuery,
     useGetOrdersQuery,
     useGetOrderByIdQuery,
-    useAuthQuery,
+    useAuthMutation,
     useGetClientByIdQuery,
     useAddOrderMutation,
     useUpdateOrderMutation,

@@ -15,7 +15,7 @@ const FormInput = ({ containerStyle, label, placeholder, prependComponent, appen
                 <TextInput
                     style={{ flex: 1 }}
                     value={value}
-                    maxLength={12}
+                    // maxLength={12}
                     placeholder={placeholder}
                     placeholderTextColor={COLORS.gray}
                     secureTextEntry={secureTextEntry}
@@ -40,7 +40,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: COLORS.lightGray2,
         marginHorizontal: 10,
-        borderRadius: 10
+        borderRadius: 10,
+        padding: SIZES.padding
     },
     prefix: {
         paddingHorizontal: 10,

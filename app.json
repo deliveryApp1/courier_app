@@ -3,6 +3,15 @@
   "displayName": "Courier",
   "expo": {
     "name": "Courier",
-    "slug": "courier"
+    "slug": "courier",
+    "android": {
+      "package": "courier.uz"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f9aff046-75bd-4037-a336-81b75abc1db7"
+      }
+    },
+    "owner": "umidermatov"
   }
 }

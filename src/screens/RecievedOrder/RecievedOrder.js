@@ -62,7 +62,7 @@ const RecievedOrder = ({ navigation, route }) => {
                 onPress={() => {
                     dispatch(changeTabIndex(1))
                     navigation.navigate('FulfilledOrders')
-                    updateOrder({ id: route.params.id, status: "DELIVERED" })
+                    // updateOrder({ id: route.params.id, status: "DELIVERED" })
                 }}
                 buttonContainerStyle={styles.footerButton}
             />

@@ -13,5 +13,4 @@ export const store = configureStore({
             serializableCheck: false
         }).concat(orderApi.middleware)
 })
-
 setupListeners(store.dispatch)

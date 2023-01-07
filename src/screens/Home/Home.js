@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, FlatList, Image, Switch, StatusBar, ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, FlatList, Image, Switch, StatusBar, ActivityIndicator, Platform } from 'react-native'
 // import { Header } from '@rneui/themed';
 import React, { useState, useRef, useMemo, useCallback, useEffect } from 'react'
 import { COLORS, icons, SIZES } from '../../constants'
@@ -44,11 +44,11 @@ const Home = ({ navigation }) => {
         bottomSheetRef.current?.snapToIndex(index)
         setIsOpenSheet(true)
     },)
-    if (isError) {
-        return (<View style={{ flex: 1, justifyContent: 'center' }}>
-            <Text>{error}</Text>
-        </View>)
-    }
+    // if (isError) {
+    //     return (<View style={{ flex: 1, justifyContent: 'center' }}>
+    //         <Text>{error}</Text>
+    //     </View>)
+    // }
     // if (isLoading) {
     //     return (<View style={{ flex: 1, justifyContent: 'center' }}>
     //         <ActivityIndicator size="large" color={COLORS.primary} />
@@ -58,11 +58,13 @@ const Home = ({ navigation }) => {
     const acceptOrder = () => {
         if (orderInfo.simpleOrder) {
             bottomSheetRef.current.close()
-            // dispatch(orderApi.endpoints.getActiveOrders.initiate(1, { forceRefetch: true }))
+            dispatch(orderApi.endpoints.getActiveOrders.initiate(1, { forceRefetch: true }))
             navigation.navigate('recievedOrder', orderInfo.simpleOrder)
             updateOrder({ id: orderInfo.simpleOrder.id, status: "ONTHEWAY" })
         }
     }
+    // console.log('data: ', data);
+
     return (
         <SafeAreaView style={{
             flex: 1
@@ -77,66 +79,75 @@ const Home = ({ navigation }) => {
                         <ActivityIndicator size="large" color={COLORS.primary} />
                     </View>
                     :
-                    <>{data.data ? <FlatList
-                        data={data?.data}
-                        ItemSeparatorComponent={<View
-                            style={{ height: 1, backgroundColor: "#d9d9d9", borderRadius: 400 }}
-                        />}
-                        keyExtractor={item => item.id}
-                        contentContainerStyle={{
-                            // marginBottom: 200
-                        }}
-                        ListEmptyComponent={
-                            <View style={{ flex: 1, alignItems: "center", justifyContent: 'center' }}>
-                                <Text style={{ padding: 20, marginTop: 5, fontSize: 15 }}>Empty list</Text>
-                            </View>
-                        }
-                        renderItem={({ item }) => {
-                            return (
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        handleSnapPress(0)
-                                        dispatch(setSimpleOrder(item))
-                                    }}
-                                >
-                                    <View>
-                                        <View style={{
-                                            flexDirection: 'row', padding: SPACING / 2,
-                                            backgroundColor: 'rgba(255, 255, 255, 0.7)', borderRadius: 8,
-                                            // elevation: 5,
-                                            shadowOffset: {
-                                                width: 0,
-                                                height: 10
-                                            },
-                                            shadowRadius: 20,
-                                            shadowColor: "#000",
-                                            shadowOpacity: 0.5
-                                        }}>
-                                            <Image
-                                                source={icons.destination}
-                                                style={{ width: AVATAR_SIZE / 2, height: AVATAR_SIZE / 2, marginRight: SPACING / 2 }}
-                                            />
-                                            <View style={{ flexDirection: 'column', paddingRight: SIZES.padding, marginRight: SIZES.padding }}>
-                                                <Text style={{ fontSize: 18, fontWeight: '600', color: COLORS.black }}>{item.data?.location?.address?.substring(item.data?.location?.address?.indexOf(',') + 1)}</Text>
-                                                {/* <Text style={{ fontSize: 18, fontWeight: '600', color: COLORS.secondary }}>Location1</Text> */}
-                                            </View>
-                                        </View>
-                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: SPACING / 2 }}>
-                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "47%" }}>
-                                                <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                    <>
+                        {data && data.data ?
+                            <FlatList
+                                data={data?.data}
+                                // ItemSeparatorComponent={<View style={{ height: 1, backgroundColor: "#d9d9d9", borderRadius: 400 }} />}
+                                ItemSeparatorComponent={
+                                    Platform.OS === 'android' &&
+                                    (({ highlighted }) => (
+                                        <View
+                                            // style={[style.separator, highlighted && { marginLeft: 0 }]}
+                                            style={{ height: 1, backgroundColor: "#d9d9d9", borderRadius: 400 }}
+                                        />
+                                    ))
+                                }
+                                keyExtractor={item => item.id}
+                                contentContainerStyle={{
+                                    // marginBottom: 200
+                                }}
+                                ListEmptyComponent={
+                                    <View style={{ flex: 1, alignItems: "center", justifyContent: 'center' }}>
+                                        <Text style={{ padding: 20, marginTop: 5, fontSize: 15 }}>Empty list</Text>
+                                    </View>
+                                }
+                                renderItem={({ item }) => {
+                                    return (
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                handleSnapPress(0)
+                                                dispatch(setSimpleOrder(item))
+                                            }}
+                                        >
+                                            <View>
+                                                <View style={{
+                                                    flexDirection: 'row', padding: SPACING / 2,
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.7)', borderRadius: 8,
+                                                    // elevation: 5,
+                                                    shadowOffset: {
+                                                        width: 0,
+                                                        height: 10
+                                                    },
+                                                    shadowRadius: 20,
+                                                    shadowColor: "#000",
+                                                    shadowOpacity: 0.5
+                                                }}>
                                                     <Image
-                                                        source={icons.clock}
-                                                        style={{
-                                                            width: 16,
-                                                            height: 16,
-                                                            // tintColor: COLORS.primary,
-                                                            marginRight: 2,
-                                                            alignSelf: 'center'
-                                                        }}
+                                                        source={icons.destination}
+                                                        style={{ width: AVATAR_SIZE / 2, height: AVATAR_SIZE / 2, marginRight: SPACING / 2 }}
                                                     />
-                                                    <Text style={{ color: COLORS.black }}>{item.createdAt ? moment(item.createdAt).format("DD-MM-YYYY HH:mm") : "-"}</Text>
+                                                    <View style={{ flexDirection: 'column', paddingRight: SIZES.padding, marginRight: SIZES.padding }}>
+                                                        <Text style={{ fontSize: 18, fontWeight: '600', color: COLORS.black }}>{item.data?.location?.address?.substring(item.data?.location?.address?.indexOf(',') + 1)}</Text>
+                                                        {/* <Text style={{ fontSize: 18, fontWeight: '600', color: COLORS.secondary }}>Location1</Text> */}
+                                                    </View>
                                                 </View>
-                                                {/* <View style={{ flexDirection: 'row' }}>
+                                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: SPACING / 2 }}>
+                                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "47%" }}>
+                                                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                                            <Image
+                                                                source={icons.clock}
+                                                                style={{
+                                                                    width: 16,
+                                                                    height: 16,
+                                                                    // tintColor: COLORS.primary,
+                                                                    marginRight: 2,
+                                                                    alignSelf: 'center'
+                                                                }}
+                                                            />
+                                                            <Text style={{ color: COLORS.black }}>{item.createdAt ? moment(item.createdAt).format("DD-MM-YYYY HH:mm") : "-"}</Text>
+                                                        </View>
+                                                        {/* <View style={{ flexDirection: 'row' }}>
                                                 <Image
                                                     source={icons.location}
                                                     style={{
@@ -144,14 +155,14 @@ const Home = ({ navigation }) => {
                                                         height: 16,
                                                         tintColor: COLORS.primary,
                                                         marginRight: 2,
-                                                        
+
                                                     }}
                                                 />
                                                 <Text style={{ color: COLORS.black }}>12 km</Text>
                                             </View> */}
-                                            </View>
-                                            <View style={{ flexDirection: 'row', width: '47%', justifyContent: 'flex-end' }}>
-                                                {/* <View style={{ flexDirection: 'row' }}>
+                                                    </View>
+                                                    <View style={{ flexDirection: 'row', width: '47%', justifyContent: 'flex-end' }}>
+                                                        {/* <View style={{ flexDirection: 'row' }}>
                                                 <Image
                                                     source={icons.clock}
                                                     style={{
@@ -164,20 +175,22 @@ const Home = ({ navigation }) => {
                                                 />
                                                 <Text style={{ color: COLORS.black }}>{item.createdAt ? moment(item.createdAt).format("DD-MM-YYYY HH:mm") : "-"}</Text>
                                             </View> */}
-                                                <Image
-                                                    source={item.paymentType === 'CASH' ? icons.cash : icons.credit_card}
-                                                    style={{
-                                                        width: 25,
-                                                        height: 25
-                                                    }}
-                                                />
+                                                        <Image
+                                                            source={item.paymentType === 'CASH' ? icons.cash : icons.credit_card}
+                                                            style={{
+                                                                width: 25,
+                                                                height: 25
+                                                            }}
+                                                        />
+                                                    </View>
+                                                </View>
                                             </View>
-                                        </View>
-                                    </View>
-                                </TouchableOpacity>
-                            )
-                        }}
-                    /> : <Text>No orders</Text>}</>
+                                        </TouchableOpacity>
+                                    )
+                                }}
+                            />
+                            : <Text>No orders</Text>}
+                    </>
                 }
             </View>
             <BottomSheet

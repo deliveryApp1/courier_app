@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Button, Pressable } from 'react-native';
+import { View, Image, StyleSheet, Button, Pressable, ActivityIndicator, Alert } from 'react-native';
 import AuthLayout from './AuthLayout'
-import { SIZES, FONTS, COLORS, icons } from '../../constants';
-import { useDispatch, useSelector } from 'react-redux';
-import { setAuthNumber } from '../../redux/slices/userSlice';
+import { SIZES, COLORS, icons } from '../../constants';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../redux/slices/userSlice';
+import { useAuthMutation } from '../../redux/services/orderApi';
 import { FormInput, CustomSwitch, TextButton, TextIconButton } from '../../components';
-
 
 const Login = ({ navigation }) => {
     const dispatch = useDispatch()
-    // const [password, setPassword] = useState("")
+    const [password, setPassword] = useState("")
     const [number, setNumber] = useState("")
-    const { authNumber } = useSelector(state => state.user)
     const [numberError, setNumberError] = useState("")
+    const [passError, setPassError] = useState("")
+    const [auth, { isLoading }] = useAuthMutation();
     // const [showPass, setShowPass] = useState(false)
     // const [saveMe, setSaveMe] = useState(false)
 
@@ -38,37 +39,131 @@ const Login = ({ navigation }) => {
     //             )
     //         })
     // }
+    if (isLoading) {
+        return <View style={{ flex: 1, justifyContent: 'center' }}>
+            <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+    }
     return (
         <AuthLayout
             title="Let's Sign In"
             subtitle="Welcome back, you've been missed"
         >
             <View style={{ flex: 1, justifyContent: 'space-between' }}>
-                <View style={{ marginTop: 10 }}>
+                <View>
+
                     <FormInput
                         label='Login'
-                        keyboardType='numeric'
-                        autoComplete='tel-country-code'
+                        // keyboardType='numeric'
+                        // autoComplete='tel-country-code'
+
                         onChange={value => {
-                            setNumber(value.replace(/[^0-9]/g, ''))
+                            // setNumber(value.replace(/[^0-9]/g, ''))
+                            setNumber(value)
+                            if (value.length) {
+                                setNumberError("")
+                            } else {
+                                setNumberError("Enter login")
+                            }
                         }}
+                        containerStyle={{ marginVertical: 20 }}
                         value={number}
                         secureTextEntry={false}
-                        prefix={"+7"}
+                        // prefix={"+7"}
                         errorMsg={numberError}
-                        onSubmitEditing={() => {
-                            console.log("number: ", number);
-                            if (number.length === 9) {
-                                dispatch(setAuthNumber(number))
-                                navigation.navigate("OTP")
+                        onSubmitEditing={async () => {
+                            if (number.length) {
+                                if (password.length) {
+                                    try {
+                                        const formState = { phoneNumber: `998${password}`, password: number }
+                                        const result = await auth(formState);
+                                        if (result.data && result.data.token) {
+                                            const userPayload = {
+                                                isAllowed: true,
+                                                token: result.data.token,
+                                                lang: 'ru'
+                                            }
+                                            dispatch(setUser(userPayload));
+                                            navigation.navigate("Home");
+                                        } else if (result.error) {
+                                            Alert.alert("Error", result.error.data.error)
+                                        }
+                                    } catch (err) {
+                                        console.log(err);
+                                    }
+                                    // dispatch(setAuthNumber(number))
+                                    // navigation.navigate("OTP")
+                                } else {
+                                    setPassError('Enter password')
+                                }
                             } else {
-                                setNumberError("Number should be 9 characters")
+                                if (!password.length) {
+                                    setPassError('Enter password')
+                                }
+                                setNumberError("Enter login")
                             }
                         }}
                         appendComponent={
                             <View style={{ justifyContent: 'center' }}>
                                 <Image source={number == "" || (number != "" && numberError == "") ? icons.correct : icons.cancel}
                                     style={{ height: 20, width: 20, tintColor: number == "" ? COLORS.gray : (number != "" && numberError == "") ? COLORS.green : COLORS.red }}
+                                />
+                            </View>
+                        }
+                    />
+                    <FormInput
+                        label='Password'
+                        // keyboardType='numeric'
+                        // autoComplete='tel-country-code'
+                        onChange={value => {
+                            if (value.length) {
+                                setPassError("")
+                            } else {
+                                setPassError("Enter password")
+                            }
+                            setPassword(value)
+                        }}
+
+                        // prefix={"+7"}
+                        value={password}
+                        secureTextEntry={false}
+                        errorMsg={passError}
+                        onSubmitEditing={async () => {
+                            if (number.length) {
+                                if (password.length) {
+                                    try {
+                                        const formState = { phoneNumber: `998${password}`, password: number }
+                                        const result = await auth(formState);
+                                        if (result.data && result.data.token) {
+                                            const userPayload = {
+                                                isAllowed: true,
+                                                token: result.data.token,
+                                                lang: 'ru'
+                                            }
+                                            dispatch(setUser(userPayload));
+                                            navigation.navigate("Home");
+                                        } else if (result.error) {
+                                            Alert.alert("Error", result.error.data.error)
+                                        }
+                                    } catch (err) {
+                                        console.log(err);
+                                    }
+                                    // dispatch(setAuthNumber(number))
+                                    // navigation.navigate("OTP")
+                                } else {
+                                    setPassError('Enter password')
+                                }
+                            } else {
+                                if (!password.length) {
+                                    setPassError('Enter password')
+                                }
+                                setNumberError("Enter login")
+                            }
+                        }}
+                        appendComponent={
+                            <View style={{ justifyContent: 'center' }}>
+                                <Image source={password == "" || (password != "" && passError == "") ? icons.correct : icons.cancel}
+                                    style={{ height: 20, width: 20, tintColor: password == "" ? COLORS.gray : (password != "" && passError == "") ? COLORS.green : COLORS.red }}
                                 />
                             </View>
                         }
@@ -93,14 +188,37 @@ const Login = ({ navigation }) => {
                         backgroudColor: COLORS.primary,
                         marginBottom: SIZES.padding
                     }}
-                    disabled={number ? false : true}
-                    onPress={() => {
-                        console.log("number: ", number);
-                        if (number.length === 9) {
-                            dispatch(setAuthNumber(number))
-                            navigation.navigate("OTP")
+                    // disabled={number ? false : true}
+                    onPress={async () => {
+                        if (number.length) {
+                            if (password.length) {
+                                try {
+                                    const formState = { phoneNumber: `998${password}`, password: number }
+                                    const result = await auth(formState);
+                                    if (result.data && result.data.token) {
+                                        const userPayload = {
+                                            isAllowed: true,
+                                            token: result.data.token,
+                                            lang: 'ru'
+                                        }
+                                        dispatch(setUser(userPayload));
+                                        navigation.navigate("Home");
+                                    } else if (result.error) {
+                                        Alert.alert("Error", result.error.data.error)
+                                    }
+                                } catch (err) {
+                                    console.log(err);
+                                }
+                                // dispatch(setAuthNumber(number))
+                                // navigation.navigate("OTP")
+                            } else {
+                                setPassError('Enter password')
+                            }
                         } else {
-                            setNumberError("Number should be 9 characters")
+                            if (!password.length) {
+                                setPassError('Enter password')
+                            }
+                            setNumberError("Enter login")
                         }
                     }}
                 />
